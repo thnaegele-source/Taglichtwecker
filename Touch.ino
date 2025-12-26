@@ -1,8 +1,5 @@
 #include "Globals.h"
 
-int sunriseDuration = 20;
-int sunriseMaxBrightness = 80;
-
 void handleTouchInput(DateTime now) {
   static bool touching = false;
   static int startX = 0;
@@ -64,13 +61,26 @@ void handleTouchInput(DateTime now) {
         // LICHT Button (Main Screen)
         if (currentScreen == SCREEN_MAIN) {
           if (startX >= 5 && startX <= 115 && startY >= 170 && startY <= 240) {
-            lightOn = true;
-            fastSunrise = true;
-            sunriseStartTime = millis();
-            sunriseRunning = true;
-            strip.setBrightness(1);
-            strip.clear();
-            strip.show();
+            // Toggle-Funktion: An/Aus
+            if (lightOn || sunriseRunning) {
+              // Licht ausschalten
+              lightOn = false;
+              sunriseRunning = false;
+              strip.setBrightness(0);
+              strip.clear();
+              strip.show();
+              Serial.println("Licht AUS");
+            } else {
+              // Licht einschalten mit Sonnenaufgang
+              lightOn = true;
+              fastSunrise = false;
+              sunriseStartTime = millis();
+              sunriseRunning = true;
+              strip.setBrightness(1);
+              strip.clear();
+              strip.show();
+              Serial.println("Sonnenaufgang START");
+            }
             drawLightButton();
             return;
           }
@@ -87,7 +97,7 @@ void handleTouchInput(DateTime now) {
                 case 0: currentScreen = SCREEN_TIME; drawTimeScreen(); break;
                 case 1: currentScreen = SCREEN_DATE; drawDateScreen(); break;
                 case 2: currentScreen = SCREEN_ALARM; drawAlarmScreen(); break;
-                case 3: currentScreen = SCREEN_SUNRISE; drawSunriseScreen(sunriseDuration, sunriseMaxBrightness); break;
+                case 3: currentScreen = SCREEN_SUNRISE; drawSunriseScreen(alarmSettings.sunriseDuration, alarmSettings.maxBrightness); break;
                 case 4: currentScreen = SCREEN_DISPLAY; drawDisplayScreen(); break;
               }
               return;
@@ -98,27 +108,27 @@ void handleTouchInput(DateTime now) {
         // Sunrise-Menü – Tap für + / -
         if (currentScreen == SCREEN_SUNRISE) {
           if (startX >= 200 && startX <= 270 && startY >= 50 && startY <= 100) { // Dauer +
-            if (sunriseDuration + 1 > 60) sunriseDuration = 60;
-            else sunriseDuration += 1;
-            drawSunriseScreen(sunriseDuration, sunriseMaxBrightness);
+            if (alarmSettings.sunriseDuration + 1 > 60) alarmSettings.sunriseDuration = 60;
+            else alarmSettings.sunriseDuration += 1;
+            drawSunriseScreen(alarmSettings.sunriseDuration, alarmSettings.maxBrightness);
             return;
           }
           if (startX >= 260 && startX <= 330 && startY >= 50 && startY <= 100) { // Dauer -
-            if (sunriseDuration - 1 < 1) sunriseDuration = 1;
-            else sunriseDuration -= 1;
-            drawSunriseScreen(sunriseDuration, sunriseMaxBrightness);
+            if (alarmSettings.sunriseDuration - 1 < 1) alarmSettings.sunriseDuration = 1;
+            else alarmSettings.sunriseDuration -= 1;
+            drawSunriseScreen(alarmSettings.sunriseDuration, alarmSettings.maxBrightness);
             return;
           }
           if (startX >= 200 && startX <= 270 && startY >= 110 && startY <= 160) { // Helligkeit +
-            if (sunriseMaxBrightness + 5 > 100) sunriseMaxBrightness = 100;
-            else sunriseMaxBrightness += 5;
-            drawSunriseScreen(sunriseDuration, sunriseMaxBrightness);
+            if (alarmSettings.maxBrightness + 5 > 100) alarmSettings.maxBrightness = 100;
+            else alarmSettings.maxBrightness += 5;
+            drawSunriseScreen(alarmSettings.sunriseDuration, alarmSettings.maxBrightness);
             return;
           }
           if (startX >= 260 && startX <= 330 && startY >= 110 && startY <= 160) { // Helligkeit -
-            if (sunriseMaxBrightness - 5 < 10) sunriseMaxBrightness = 10;
-            else sunriseMaxBrightness -= 5;
-            drawSunriseScreen(sunriseDuration, sunriseMaxBrightness);
+            if (alarmSettings.maxBrightness - 5 < 10) alarmSettings.maxBrightness = 10;
+            else alarmSettings.maxBrightness -= 5;
+            drawSunriseScreen(alarmSettings.sunriseDuration, alarmSettings.maxBrightness);
             return;
           }
         }
