@@ -23,7 +23,7 @@
 #define NUM_LEDS 800
 #define AUTO_BACK_DELAY 20000
 #define TOUCH_THRESHOLD 12
-#define LEDS_PER_SIDE 300
+#define LEDS_PER_SIDE 400
 #define DEBOUNCE_DELAY 50
 
 // BILDSCHIRME
@@ -44,16 +44,13 @@ extern RTC_DS3231 rtc;
 
 // Variablen
 extern int16_t touchMinX, touchMaxX, touchMinY, touchMaxY;
-
 extern bool lightOn;
 extern unsigned long sunriseStartTime;
 extern bool sunriseRunning;
 extern bool fastSunrise;
-
 extern int currentScreen;
 extern unsigned long lastTouchTime;
 extern unsigned long lastScreenTime;
-
 extern bool leftStripOn, rightStripOn;
 extern bool lastLeftState, lastRightState;
 
@@ -77,9 +74,7 @@ struct DisplaySettings {
 
 extern AlarmSettings alarmSettings;
 extern DisplaySettings displaySettings;
-
 extern const int brightOptions[7];
-
 extern uint32_t sunriseColors[10];
 
 #define WARM_WHITE strip.Color(255, 147, 41)
