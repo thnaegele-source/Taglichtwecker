@@ -4,22 +4,44 @@ void handleSideButtons() {
   bool currLeft = digitalRead(TOUCH_LEFT);
   bool currRight = digitalRead(TOUCH_RIGHT);
   
+  // Bei 160 LEDs/Meter und 5m = 800 LEDs
+  // 20cm dunkel = 32 LEDs (160 * 0.20)
+  // 30cm Fade = 48 LEDs (160 * 0.30)
+  int darkZoneLEDs = 32;    // Die inneren 20cm bleiben aus
+  int fadeZoneLEDs = 48;     // 30cm sanfter Übergang
+  
   // Linker Touch-Sensor
   if (currLeft == LOW && lastLeftState == HIGH) {
     delay(DEBOUNCE_DELAY);
     if (digitalRead(TOUCH_LEFT) == LOW) {
       leftStripOn = !leftStripOn;
       
-      // Warmweißes Licht für linke Seite
       if (leftStripOn) {
         for (int i = 0; i < LEDS_PER_SIDE; i++) {
-          strip.setPixelColor(i, WARM_WHITE);
+          int distanceFromCenter = LEDS_PER_SIDE - i;  // Abstand zur Mitte
+          
+          if (distanceFromCenter <= darkZoneLEDs) {
+            // Innere 20cm: komplett dunkel
+            strip.setPixelColor(i, 0);
+          } else if (distanceFromCenter <= darkZoneLEDs + fadeZoneLEDs) {
+            // Fade-Zone: sanft heller werden nach außen
+            int fadePos = distanceFromCenter - darkZoneLEDs;
+            float fadeFactor = (float)fadePos / fadeZoneLEDs;
+            
+            uint8_t r = (uint8_t)(255 * fadeFactor);
+            uint8_t g = (uint8_t)(147 * fadeFactor);
+            uint8_t b = (uint8_t)(41 * fadeFactor);
+            
+            strip.setPixelColor(i, strip.Color(r, g, b));
+          } else {
+            // Äußerer Bereich: volle Helligkeit
+            strip.setPixelColor(i, WARM_WHITE);
+          }
         }
-        strip.setBrightness(50);  // Nachttischlicht-Helligkeit
+        strip.setBrightness(60);  // Etwas heller als vorher
         strip.show();
-        Serial.println("Linkes Licht AN");
+        Serial.println("Linkes Licht AN (20cm dunkel, Fade nach außen)");
       } else {
-        // Nur linke Seite ausschalten
         for (int i = 0; i < LEDS_PER_SIDE; i++) {
           strip.setPixelColor(i, 0);
         }
@@ -35,16 +57,32 @@ void handleSideButtons() {
     if (digitalRead(TOUCH_RIGHT) == LOW) {
       rightStripOn = !rightStripOn;
       
-      // Warmweißes Licht für rechte Seite
       if (rightStripOn) {
         for (int i = LEDS_PER_SIDE; i < NUM_LEDS; i++) {
-          strip.setPixelColor(i, WARM_WHITE);
+          int distanceFromCenter = i - LEDS_PER_SIDE;  // Abstand zur Mitte
+          
+          if (distanceFromCenter <= darkZoneLEDs) {
+            // Innere 20cm: komplett dunkel
+            strip.setPixelColor(i, 0);
+          } else if (distanceFromCenter <= darkZoneLEDs + fadeZoneLEDs) {
+            // Fade-Zone: sanft heller werden nach außen
+            int fadePos = distanceFromCenter - darkZoneLEDs;
+            float fadeFactor = (float)fadePos / fadeZoneLEDs;
+            
+            uint8_t r = (uint8_t)(255 * fadeFactor);
+            uint8_t g = (uint8_t)(147 * fadeFactor);
+            uint8_t b = (uint8_t)(41 * fadeFactor);
+            
+            strip.setPixelColor(i, strip.Color(r, g, b));
+          } else {
+            // Äußerer Bereich: volle Helligkeit
+            strip.setPixelColor(i, WARM_WHITE);
+          }
         }
-        strip.setBrightness(50);  // Nachttischlicht-Helligkeit
+        strip.setBrightness(60);  // Etwas heller als vorher
         strip.show();
-        Serial.println("Rechtes Licht AN");
+        Serial.println("Rechtes Licht AN (20cm dunkel, Fade nach außen)");
       } else {
-        // Nur rechte Seite ausschalten
         for (int i = LEDS_PER_SIDE; i < NUM_LEDS; i++) {
           strip.setPixelColor(i, 0);
         }
