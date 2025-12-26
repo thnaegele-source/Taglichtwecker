@@ -3,26 +3,26 @@
 void drawMainScreen() {
   tft.fillScreen(TFT_BLACK);
   DateTime n = rtc.now();
-
+  
   // Uhrzeit – groß, perfekt mittig, höher
   tft.setTextSize(5);
   tft.setTextColor(TFT_WHITE);
-  tft.setCursor(40, 50);  // x=40 für perfekte Mitte bei TextSize 5 auf 320px Breite
+  tft.setCursor(40, 50);
   tft.printf("%02d:%02d", n.hour(), n.minute());
-
+  
   // Datum – mittig, darunter, voll sichtbar
   tft.setTextSize(2);
-  tft.setCursor(70, 130);  // x=70 für Mitte bei TextSize 2 (10 Zeichen)
+  tft.setCursor(70, 130);
   tft.printf("%02d.%02d.%04d", n.day(), n.month(), n.year());
-
-  // Wecker-Status – rechts platziert, keine Überdeckung mit LICHT-Button
+  
+  // Wecker-Status – rechts platziert
   tft.setTextColor(TFT_CYAN);
   tft.setTextSize(2);
   tft.setCursor(170, 170);
   tft.print(F("Wecker: "));
   tft.print(alarmSettings.active ? F("AN") : F("AUS"));
-
-  // LICHT Button – unverändert
+  
+  // LICHT Button
   drawLightButton();
 }
 
@@ -37,13 +37,13 @@ void drawLightButton() {
 
 void updateMainScreenTime(DateTime now) {
   static int lastHour = -1, lastMinute = -1;
+  
   if (now.hour() != lastHour || now.minute() != lastMinute) {
     lastHour = now.hour();
     lastMinute = now.minute();
-
+    
     // Alte Uhrzeit überschreiben
     tft.fillRect(30, 45, 260, 60, TFT_BLACK);
-
     tft.setTextSize(5);
     tft.setTextColor(TFT_WHITE);
     tft.setCursor(40, 50);
