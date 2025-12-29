@@ -8,7 +8,7 @@ void updateSunrise() {
   if (elapsed >= totalDuration) {
     strip.setBrightness(alarmSettings.maxBrightness);
     for (int i = 0; i < strip.numPixels(); i++) {
-      strip.setPixelColor(i, strip.Color(255, 220, 180));  // Warmes Taglicht
+      strip.setPixelColor(i, strip.Color(255, 180, 100));
     }
     strip.show();
     sunriseRunning = false;
@@ -21,54 +21,70 @@ void updateSunrise() {
   uint8_t brightness = (uint8_t)(progress * alarmSettings.maxBrightness);
   strip.setBrightness(brightness);
   
-  uint8_t r, g, b;
+  int numPixels = strip.numPixels();
+  int waggonLength = numPixels / 3; // 267 LEDs
+  int transitionLength = 50;
   
-  // Phase 1: Dunkles Blau → Helles Blau (0-20%)
-  if (progress < 0.2f) {
-    float t = progress / 0.2f;
-    r = (uint8_t)(30 * t);
-    g = 0;
-    b = (uint8_t)(100 + 155 * t);
-  } 
-  // Phase 2: Blau → Violett/Rosa (20-40%)
-  else if (progress < 0.4f) {
-    float t = (progress - 0.2f) / 0.2f;
-    r = (uint8_t)(100 + 155 * t);
-    g = (uint8_t)(30 * t);
-    b = 255;
-  } 
-  // Phase 3: Rosa → Orange (40-70%)
-  else if (progress < 0.7f) {
-    float t = (progress - 0.4f) / 0.3f;
-    r = 255;
-    g = (uint8_t)(100 + 155 * t);
-    b = (uint8_t)(255 - 155 * t);
-  } 
-  // Phase 4: Orange → Gelb/Weiß (70-100%)
-  else {
-    float t = (progress - 0.7f) / 0.3f;
-    r = 255;
-    g = (uint8_t)(255 - 35 * t);
-    b = (uint8_t)(100 + 80 * t);
-  }
+  struct Color {
+    uint8_t r, g, b;
+  };
   
-  // LEDs progressiv einschalten
-  int litPixels = (int)(progress * strip.numPixels() + 1);
-  for (int i = 0; i < strip.numPixels(); i++) {
-    if (i < litPixels) {
-      strip.setPixelColor(i, strip.Color(r, g, b));
-    } else {
-      strip.setPixelColor(i, 0);
+  Color colors[6] = {
+    {10, 5, 120},     // Blau
+    {60, 10, 200},    // Lila
+    {255, 0, 0},      // Rot
+    {255, 50, 0},     // Orange
+    {255, 200, 20},   // Gelb
+    {255, 180, 100}   // Tageslicht
+  };
+  
+  // Zuglänge
+  float segmentLength = waggonLength + transitionLength;
+  float trainLength = segmentLength * 5 + numPixels; // 2386 LEDs
+  
+  // Front muss bei Sekunde letzter bei Position numPixels + (trainLength - numPixels) sein
+  // damit LED 800 im Tageslicht liegt
+  float trainFront = progress * trainLength;
+  
+  for (int i = 0; i < numPixels; i++) {
+    float distanceFromFront = trainFront - i;
+    
+    uint8_t r, g, b;
+    
+    if (distanceFromFront < 0) {
+      r = 0; g = 0; b = 0;
     }
+    else if (distanceFromFront < segmentLength * 5) {
+      int segment = (int)(distanceFromFront / segmentLength);
+      float posInSegment = distanceFromFront - (segment * segmentLength);
+      
+      if (posInSegment < waggonLength) {
+        r = colors[segment].r;
+        g = colors[segment].g;
+        b = colors[segment].b;
+      }
+      else {
+        float t = (posInSegment - waggonLength) / transitionLength;
+        t = (1.0 - cos(t * 3.14159)) / 2.0;
+        
+        r = (uint8_t)(colors[segment].r + (colors[segment+1].r - colors[segment].r) * t);
+        g = (uint8_t)(colors[segment].g + (colors[segment+1].g - colors[segment].g) * t);
+        b = (uint8_t)(colors[segment].b + (colors[segment+1].b - colors[segment].b) * t);
+      }
+    }
+    else {
+      r = 255; g = 180; b = 100;
+    }
+    
+    strip.setPixelColor(i, strip.Color(r, g, b));
   }
   
   strip.show();
   
-  // Debug-Ausgabe alle 10 Sekunden
   static unsigned long lastDebug = 0;
-  if (millis() - lastDebug > 10000) {
-    Serial.printf("Sunrise: %.1f%% - Brightness: %d - RGB(%d,%d,%d)\n", 
-                  progress * 100, brightness, r, g, b);
+  if (millis() - lastDebug > 1000) {
+    Serial.printf("Sek %.0f - Front: %.1f (%.1f LEDs/sek)\n", 
+                  elapsed/1000.0, trainFront, trainLength/(totalDuration/1000.0));
     lastDebug = millis();
   }
 }
