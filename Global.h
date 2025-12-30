@@ -1,11 +1,11 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#include <Wire.h>
+#include <RTClib.h>
 #include <TFT_eSPI.h>
 #include <XPT2046_Touchscreen.h>
 #include <Adafruit_NeoPixel.h>
-#include <RTClib.h>
-#include <Wire.h>
 
 // PINS
 #define TFT_CS     15
@@ -78,5 +78,16 @@ extern const int brightOptions[7];
 extern uint32_t sunriseColors[10];
 
 #define WARM_WHITE strip.Color(255, 147, 41)
+
+// Funktionsdeklarationen
+void drawMainScreen();
+void drawLightButton();
+void updateMainScreenTime(DateTime now);
+void drawMenuScreen();
+void drawTimeScreen();
+void drawDateScreen();
+void drawAlarmScreen();
+void drawSunriseScreen(int duration, int brightness);
+void drawDisplayScreen();
 
 #endif
