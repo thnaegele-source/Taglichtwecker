@@ -23,7 +23,7 @@ void updateSunrise() {
   
   int numPixels = strip.numPixels();
   int waggonLength = numPixels / 3; // 267 LEDs
-  int transitionLength = 50;
+  int transitionLength = 100; // Größere Farbverläufe
   
   struct Color {
     uint8_t r, g, b;
@@ -31,19 +31,18 @@ void updateSunrise() {
   
   Color colors[6] = {
     {10, 5, 120},     // Blau
-    {60, 10, 200},    // Lila
+    {20, 30, 240},    // Lila (noch bläulicher: mehr Blau, weniger Rot)
     {255, 0, 0},      // Rot
     {255, 50, 0},     // Orange
-    {255, 200, 20},   // Gelb
+    {255, 160, 10},   // Gelb (weniger grünlich: G von 180 auf 160)
     {255, 180, 100}   // Tageslicht
   };
   
   // Zuglänge
   float segmentLength = waggonLength + transitionLength;
-  float trainLength = segmentLength * 5 + numPixels; // 2386 LEDs
+  float trainLength = segmentLength * 5 + numPixels;
   
-  // Front muss bei Sekunde letzter bei Position numPixels + (trainLength - numPixels) sein
-  // damit LED 800 im Tageslicht liegt
+  // Front startet bei 0
   float trainFront = progress * trainLength;
   
   for (int i = 0; i < numPixels; i++) {
@@ -83,8 +82,7 @@ void updateSunrise() {
   
   static unsigned long lastDebug = 0;
   if (millis() - lastDebug > 1000) {
-    Serial.printf("Sek %.0f - Front: %.1f (%.1f LEDs/sek)\n", 
-                  elapsed/1000.0, trainFront, trainLength/(totalDuration/1000.0));
+    Serial.printf("Sek %.0f - Front: %.1f\n", elapsed/1000.0, trainFront);
     lastDebug = millis();
   }
 }
