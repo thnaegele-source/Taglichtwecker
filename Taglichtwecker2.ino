@@ -4,7 +4,7 @@ void setup() {
   Serial.begin(115200);
   
   pinMode(TFT_BL, OUTPUT);
-  digitalWrite(TFT_BL, HIGH); // Backlight an
+  digitalWrite(TFT_BL, HIGH);
   
   tft.begin();
   tft.setRotation(1);
@@ -45,6 +45,13 @@ void setup() {
     alarmSettings.days[i] = false;
   }
   
+  // Display-Einstellungen initialisieren
+  displaySettings.darkHour = 22;
+  displaySettings.darkMinute = 0;
+  displaySettings.brightDurationIndex = 2;
+  displaySettings.alwaysOnHour = 7;
+  displaySettings.alwaysOnMinute = 0;
+  
   calibrateTouch();
   
   currentScreen = SCREEN_MAIN;
@@ -57,9 +64,9 @@ void loop() {
   DateTime now = rtc.now();
   
   handleSideButtons();
-  handleBacklight(now);
+  handleBacklight();
   handleTouchInput(now);
-  checkAlarmTrigger(now);  // WICHTIG: Wecker-Prüfung!
+  checkAlarmTrigger();
   
   if (sunriseRunning) updateSunrise();
   
@@ -119,6 +126,6 @@ TS_Point waitForTouch() {
   } while (p.z < TOUCH_THRESHOLD);
   
   Serial.printf("Raw: X=%d Y=%d Z=%d\n", p.x, p.y, p.z);
-  delay(300);  // Entprellen
+  delay(300);
   return p;
 }
