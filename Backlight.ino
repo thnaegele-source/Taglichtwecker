@@ -38,7 +38,7 @@ void handleSideButtons() {
             strip.setPixelColor(i, WARM_WHITE);
           }
         }
-        strip.setBrightness(60);  // Etwas heller als vorher
+        strip.setBrightness(60);
         strip.show();
         Serial.println("Linkes Licht AN (20cm dunkel, Fade nach außen)");
       } else {
@@ -79,7 +79,7 @@ void handleSideButtons() {
             strip.setPixelColor(i, WARM_WHITE);
           }
         }
-        strip.setBrightness(60);  // Etwas heller als vorher
+        strip.setBrightness(60);
         strip.show();
         Serial.println("Rechtes Licht AN (20cm dunkel, Fade nach außen)");
       } else {
@@ -98,20 +98,35 @@ void handleSideButtons() {
 
 static bool backlightWasOn = true;
 
-void handleBacklight(DateTime now) {
+void handleBacklight() {
+  DateTime now = rtc.now();
+  
   int curMin = now.hour() * 60 + now.minute();
   int darkMin = displaySettings.darkHour * 60 + displaySettings.darkMinute;
   int alwaysMin = displaySettings.alwaysOnHour * 60 + displaySettings.alwaysOnMinute;
   int brightSec = brightOptions[displaySettings.brightDurationIndex];
   
-  bool shouldOn = (curMin < darkMin) || (curMin >= alwaysMin) || (millis() - lastTouchTime < brightSec * 1000L);
+  bool shouldOn;
+  
+  // Prüfe ob wir in der "immer an" Zeit sind
+  if (alwaysMin < darkMin) {
+    // Normal: z.B. hell von 7:00 bis 22:00
+    shouldOn = (curMin >= alwaysMin && curMin < darkMin);
+  } else {
+    // Über Mitternacht: z.B. dunkel von 22:00 bis 7:00
+    shouldOn = (curMin >= alwaysMin || curMin < darkMin);
+  }
+  
+  // Oder bei Berührung innerhalb der Dauer
+  if (millis() - lastTouchTime < brightSec * 1000L) {
+    shouldOn = true;
+  }
   
   if (shouldOn != backlightWasOn) {
     backlightWasOn = shouldOn;
     digitalWrite(TFT_BL, shouldOn ? HIGH : LOW);
     
     if (shouldOn) {
-      // Beim Einschalten: Bildschirm neu zeichnen
       if (currentScreen == SCREEN_MAIN) {
         drawMainScreen();
       } else if (currentScreen == SCREEN_MENU_LIST) {
@@ -121,7 +136,9 @@ void handleBacklight(DateTime now) {
   }
 }
 
-void checkAlarmTrigger(DateTime now) {
+void checkAlarmTrigger() {
+  DateTime now = rtc.now();
+  
   static bool alarmTriggeredThisMinute = false;
   static int lastMinute = -1;
   
