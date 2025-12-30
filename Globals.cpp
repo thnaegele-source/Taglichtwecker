@@ -10,16 +10,13 @@ RTC_DS3231 rtc;
 // === VARIABLEN DEFINIEREN ===
 int16_t touchMinX = 200, touchMaxX = 3900;
 int16_t touchMinY = 200, touchMaxY = 3900;
-
 bool lightOn = false;
 unsigned long sunriseStartTime = 0;
 bool sunriseRunning = false;
 bool fastSunrise = false;
-
 int currentScreen = SCREEN_MAIN;
 unsigned long lastTouchTime = 0;
 unsigned long lastScreenTime = 0;
-
 bool leftStripOn = false;
 bool rightStripOn = false;
 bool lastLeftState = HIGH;
