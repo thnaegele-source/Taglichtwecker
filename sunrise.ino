@@ -6,12 +6,15 @@ void updateSunrise() {
   
   if (sunriseRunning && !initialized) {
     sunriseStartTime = millis();
+    screenSunriseStartTime = millis();  // NEU: Bildschirm-Sonnenaufgang auch starten!
     initialized = true;
     Serial.println("Sonnenaufgang initialisiert - Zug fährt los!");
+    Serial.println("Bildschirm-Sonnenaufgang gestartet!");
   }
   
   if (!sunriseRunning) {
     initialized = false;
+    screenSunriseStartTime = 0;  // NEU: Reset bei Ende
     return;
   }
   
@@ -27,8 +30,10 @@ void updateSunrise() {
     }
     strip.show();
     sunriseRunning = false;
+    screenSunriseStartTime = 0;  // NEU: Reset bei Ende
     lightOn = true;
     Serial.println("Sonnenaufgang BEENDET");
+    Serial.println("Bildschirm-Sonnenaufgang beendet!");
     return;
   }
   
