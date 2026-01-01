@@ -4,10 +4,10 @@ void drawDisplayScreen() {
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE);
   tft.setTextSize(2);
-  tft.setCursor(10, 5);
+  tft.setCursor(10, 3);
   tft.print(F("DISPLAY EINSTELLUNG"));
   
-  // === Dunkel ab ===
+  // === Dunkel ab === (Y: 28-103)
   tft.setTextColor(TFT_CYAN);
   tft.setTextSize(2);
   tft.setCursor(10, 28);
@@ -34,21 +34,21 @@ void drawDisplayScreen() {
   tft.setCursor(230, 48);
   tft.print(F("-"));
   
-  // M-Buttons (Minute) - mit 3px Abstand
+  // M-Buttons (Minute)
   tft.setTextSize(1);
-  tft.setCursor(140, 80);
+  tft.setCursor(140, 81);
   tft.print(F("M"));
   
-  tft.fillRoundRect(158, 75, 50, 28, 5, TFT_BLUE);
+  tft.fillRoundRect(158, 76, 50, 28, 5, TFT_BLUE);
   tft.setTextSize(2);
-  tft.setCursor(173, 79);
+  tft.setCursor(173, 80);
   tft.print(F("+"));
   
-  tft.fillRoundRect(215, 75, 50, 28, 5, TFT_BLUE);
-  tft.setCursor(230, 79);
+  tft.fillRoundRect(215, 76, 50, 28, 5, TFT_BLUE);
+  tft.setCursor(230, 80);
   tft.print(F("-"));
   
-  // === Hell ab ===
+  // === Hell ab === (Y: 113-188)
   tft.setTextColor(TFT_GREEN);
   tft.setTextSize(2);
   tft.setCursor(10, 113);
@@ -74,38 +74,51 @@ void drawDisplayScreen() {
   tft.setCursor(230, 133);
   tft.print(F("-"));
   
-  // M-Buttons (Minute) - mit 3px Abstand
+  // M-Buttons (Minute)
   tft.setTextSize(1);
-  tft.setCursor(140, 165);
+  tft.setCursor(140, 166);
   tft.print(F("M"));
   
-  tft.fillRoundRect(158, 160, 50, 28, 5, TFT_BLUE);
+  tft.fillRoundRect(158, 161, 50, 28, 5, TFT_BLUE);
   tft.setTextSize(2);
-  tft.setCursor(173, 164);
+  tft.setCursor(173, 165);
   tft.print(F("+"));
   
-  tft.fillRoundRect(215, 160, 50, 28, 5, TFT_BLUE);
-  tft.setCursor(230, 164);
+  tft.fillRoundRect(215, 161, 50, 28, 5, TFT_BLUE);
+  tft.setCursor(230, 165);
   tft.print(F("-"));
   
-  // === Display hell für ===
+  // === Display hell für === (Y: 198-237)
   tft.setTextColor(TFT_YELLOW);
   tft.setTextSize(2);
-  tft.setCursor(10, 195);
+  tft.setCursor(10, 198);
   tft.print(F("Display hell:"));
   
   tft.setTextColor(TFT_WHITE);
   tft.setTextSize(2);
-  tft.setCursor(10, 215);
+  tft.setCursor(10, 218);
   tft.printf("%d s", brightOptions[displaySettings.brightDurationIndex]);
   
   // Buttons nebeneinander
-  tft.fillRoundRect(158, 211, 50, 28, 5, TFT_BLUE);
+  tft.fillRoundRect(158, 214, 50, 28, 5, TFT_BLUE);
   tft.setTextSize(2);
-  tft.setCursor(173, 215);
+  tft.setCursor(173, 218);
   tft.print(F("+"));
   
-  tft.fillRoundRect(215, 211, 50, 28, 5, TFT_BLUE);
-  tft.setCursor(230, 215);
+  tft.fillRoundRect(215, 214, 50, 28, 5, TFT_BLUE);
+  tft.setCursor(230, 218);
   tft.print(F("-"));
+  
+  // === Touch Kalibrierung Button (rechts, volle Höhe) ===
+  tft.fillRoundRect(273, 25, 42, 215, 8, TFT_ORANGE);
+  tft.setTextColor(TFT_BLACK);
+  
+  // Text vertikal zentriert
+  tft.setTextSize(1);
+  tft.setCursor(282, 85);
+  tft.print(F("Touch"));
+  tft.setCursor(278, 105);
+  tft.print(F("Kalib-"));
+  tft.setCursor(275, 125);
+  tft.print(F("rierung"));
 }
