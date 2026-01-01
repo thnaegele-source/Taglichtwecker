@@ -32,7 +32,6 @@ void handleTouchInput(DateTime now) {
         unsigned long holdTime = millis() - touchStartTime;
         if (holdTime > 500 && (millis() - lastRepeatTime) > 150) {
           lastRepeatTime = millis();
-          // Trigger Repeat für aktuelle Position
           handleButtonRepeat(startX, startY);
         }
       }
@@ -179,13 +178,13 @@ void handleDisplayButtons(int x, int y) {
     return;
   }
   // Dunkel ab - Minute +
-  if (x >= 158 && x <= 208 && y >= 75 && y <= 103) {
+  if (x >= 158 && x <= 208 && y >= 76 && y <= 104) {
     displaySettings.darkMinute = (displaySettings.darkMinute + 1) % 60;
     drawDisplayScreen();
     return;
   }
   // Dunkel ab - Minute -
-  if (x >= 215 && x <= 265 && y >= 75 && y <= 103) {
+  if (x >= 215 && x <= 265 && y >= 76 && y <= 104) {
     displaySettings.darkMinute = (displaySettings.darkMinute + 59) % 60;
     drawDisplayScreen();
     return;
@@ -203,27 +202,33 @@ void handleDisplayButtons(int x, int y) {
     return;
   }
   // Hell ab - Minute +
-  if (x >= 158 && x <= 208 && y >= 160 && y <= 188) {
+  if (x >= 158 && x <= 208 && y >= 161 && y <= 189) {
     displaySettings.alwaysOnMinute = (displaySettings.alwaysOnMinute + 1) % 60;
     drawDisplayScreen();
     return;
   }
   // Hell ab - Minute -
-  if (x >= 215 && x <= 265 && y >= 160 && y <= 188) {
+  if (x >= 215 && x <= 265 && y >= 161 && y <= 189) {
     displaySettings.alwaysOnMinute = (displaySettings.alwaysOnMinute + 59) % 60;
     drawDisplayScreen();
     return;
   }
   // Display hell für +
-  if (x >= 158 && x <= 208 && y >= 211 && y <= 239) {
+  if (x >= 158 && x <= 208 && y >= 214 && y <= 242) {
     displaySettings.brightDurationIndex = (displaySettings.brightDurationIndex + 1) % 7;
     drawDisplayScreen();
     return;
   }
   // Display hell für -
-  if (x >= 215 && x <= 265 && y >= 211 && y <= 239) {
+  if (x >= 215 && x <= 265 && y >= 214 && y <= 242) {
     displaySettings.brightDurationIndex = (displaySettings.brightDurationIndex + 6) % 7;
     drawDisplayScreen();
+    return;
+  }
+  
+  // === Touch Kalibrierung Button (rechts, volle Höhe) ===
+  if (x >= 273 && x <= 315 && y >= 25 && y <= 240) {
+    calibrateTouch();
     return;
   }
 }
