@@ -13,6 +13,12 @@ unsigned long sunriseStartTime = 0;
 unsigned long screenSunriseStartTime = 0;
 bool sunriseRunning = false;
 bool fastSunrise = false;
+
+// NEU: Sunset Variablen
+unsigned long sunsetStartTime = 0;
+unsigned long screenSunsetStartTime = 0;
+bool sunsetRunning = false;
+
 int currentScreen = SCREEN_MAIN;
 unsigned long lastTouchTime = 0;
 unsigned long lastScreenTime = 0;
@@ -31,6 +37,7 @@ int rightClickCount = 0;
 
 AlarmSettings alarmSettings;
 DisplaySettings displaySettings;
+SunsetSettings sunsetSettings;  // NEU
 
 const int brightOptions[7] = {5, 10, 15, 30, 60, 120, 240};
 
