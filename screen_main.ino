@@ -327,22 +327,18 @@ void drawMainScreen() {
   
   tft.setTextFont(1);
   
-  // === Wecker-Status ===
-  tft.setTextFont(4);
-  tft.setTextColor(TFT_CYAN, groundColor);  // Hintergrund = groundColor
-  tft.setCursor(165, 210);
-  tft.print(alarmSettings.active ? F("Wecker AN") : F("Wecker AUS"));
-  
-  tft.setTextFont(1);
-  
-  drawLightButton();
+  // NEU: Beide Buttons zeichnen
+  drawLightButton();   // Links unten
+  drawSunsetButton();  // Rechts unten
+  drawStatusBetweenButtons();  // Status in der Mitte
   
   tft.setTextFont(1);
   tft.setTextSize(1);
 }
 
 void drawLightButton() {
-  uint16_t col = lightOn ? TFT_YELLOW : TFT_DARKGREY;
+  // GEÄNDERT: Gelb wenn entweder lightOn ODER sunriseRunning
+  uint16_t col = (lightOn || sunriseRunning) ? TFT_YELLOW : TFT_DARKGREY;
   tft.fillRoundRect(5, 197, 90, 38, 10, col);
   
   tft.setTextFont(2);
@@ -351,6 +347,57 @@ void drawLightButton() {
   tft.print(F("LICHT"));
   
   tft.setTextFont(1);
+}
+
+// NEU: Sunset Button rechts unten
+void drawSunsetButton() {
+  uint16_t col = sunsetRunning ? TFT_RED : TFT_DARKGREY;
+  tft.fillRoundRect(225, 197, 90, 38, 10, col);
+  
+  tft.setTextFont(2);
+  tft.setTextColor(TFT_WHITE, col);
+  tft.setCursor(235, 209);
+  tft.print(F("SLEEP"));
+  
+  tft.setTextFont(1);
+}
+
+// NEU: Status-Anzeige zwischen den Buttons
+void drawStatusBetweenButtons() {
+  // NUR auf dem Hauptbildschirm zeichnen!
+  if (currentScreen != SCREEN_MAIN) return;
+  
+  uint16_t groundColor = getGroundColor();
+  
+  tft.setTextFont(2);
+  tft.setTextSize(1);
+  
+  // Wecker-Status
+  tft.setTextColor(TFT_CYAN, groundColor);
+  tft.setCursor(105, 202);
+  tft.print(alarmSettings.active ? F("Wecker AN ") : F("Wecker AUS"));
+  
+  // Sunset-Status
+  tft.setTextColor(TFT_ORANGE, groundColor);
+  tft.setCursor(105, 218);
+  if (sunsetRunning) {
+    tft.print(F("Sunset "));
+    tft.print(sunsetSettings.duration);
+    tft.print(F("m   "));
+  } else if (sunsetSettings.active) {
+    // Geplanter Sunset anzeigen
+    if (sunsetSettings.hour < 10) tft.print("0");
+    tft.print(sunsetSettings.hour);
+    tft.print(F(":"));
+    if (sunsetSettings.minute < 10) tft.print("0");
+    tft.print(sunsetSettings.minute);
+    tft.print(F(" "));
+  } else {
+    tft.print(F("Sunset OFF"));
+  }
+  
+  tft.setTextFont(1);
+  tft.setTextSize(1);
 }
 
 void updateMainScreenTime(DateTime now) {
@@ -426,19 +473,14 @@ void updateMainScreenTime(DateTime now) {
       tft.print(".");
       tft.print(n.year());
       
-      // Wecker Status
-      tft.setTextFont(4);
-      tft.setTextSize(1);  // Wichtig: Size 1!
-      tft.setTextDatum(TL_DATUM);
-      tft.setTextColor(TFT_CYAN, groundColor);
-      tft.setCursor(165, 210);
-      tft.print(alarmSettings.active ? F("Wecker AN") : F("Wecker AUS"));
-      
       // Reset am Ende
       tft.setTextFont(1);
       tft.setTextSize(1);
       
+      // NEU: Beide Buttons aktualisieren
       drawLightButton();
+      drawSunsetButton();
+      drawStatusBetweenButtons();
     }
     return;
   }
