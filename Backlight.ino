@@ -363,3 +363,46 @@ void checkAlarmTrigger() {
     drawLightButton();
   }
 }
+
+void checkSunsetTrigger() {
+  DateTime now = rtc.now();
+  
+  static bool sunsetTriggeredThisMinute = false;
+  static int lastMinute = -1;
+  
+  if (now.minute() != lastMinute) {
+    sunsetTriggeredThisMinute = false;
+    lastMinute = now.minute();
+  }
+  
+  if (!sunsetSettings.active || sunsetTriggeredThisMinute) return;
+  
+  int adjustedDay = now.dayOfTheWeek() - 1;
+  if (adjustedDay < 0) adjustedDay = 6;
+  
+  if (!sunsetSettings.days[adjustedDay]) return;
+  
+  if (now.hour() == sunsetSettings.hour && now.minute() == sunsetSettings.minute && !sunsetRunning) {
+    Serial.printf("SUNSET AUSGELÖST! %02d:%02d\n", now.hour(), now.minute());
+    
+    // Andere Lichtquellen ausschalten
+    leftStripOn = false;
+    rightStripOn = false;
+    sunriseRunning = false;
+    
+    // Sunset starten
+    sunsetRunning = true;
+    sunsetStartTime = millis();
+    screenSunsetStartTime = millis();
+    strip.setBrightness(1);
+    strip.clear();
+    strip.show();
+    sunsetTriggeredThisMinute = true;
+    
+    // UI aktualisieren
+    if (currentScreen == SCREEN_MAIN) {
+      drawSunsetButton();
+      drawStatusBetweenButtons();
+    }
+  }
+}
