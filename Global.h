@@ -29,11 +29,14 @@
 // BILDSCHIRME
 #define SCREEN_MAIN       0
 #define SCREEN_MENU_LIST  1
-#define SCREEN_TIME       2
-#define SCREEN_DATE       3
-#define SCREEN_ALARM      4
-#define SCREEN_SUNRISE    5
-#define SCREEN_DISPLAY    6
+#define SCREEN_MENU_LIST2 2  // NEU: Zweites Menü
+#define SCREEN_TIME       3
+#define SCREEN_DATE       4
+#define SCREEN_ALARM      5
+#define SCREEN_SUNRISE    6
+#define SCREEN_DISPLAY    7
+#define SCREEN_ABENDLICHT 8  // Zeitplan (Uhrzeit, Tage, AN/AUS)
+#define SCREEN_SUNSET     9  // Einstellungen (Dauer, Helligkeit)
 
 // Objekte
 extern TFT_eSPI tft;
@@ -50,6 +53,12 @@ extern unsigned long sunriseStartTime;
 extern unsigned long screenSunriseStartTime;
 extern bool sunriseRunning;
 extern bool fastSunrise;
+
+// NEU: Sunset Variablen
+extern unsigned long sunsetStartTime;
+extern unsigned long screenSunsetStartTime;
+extern bool sunsetRunning;
+
 extern int currentScreen;
 extern unsigned long lastTouchTime;
 extern unsigned long lastScreenTime;
@@ -72,6 +81,16 @@ struct AlarmSettings {
   bool active;
 };
 
+// NEU: Sunset Settings
+struct SunsetSettings {
+  int hour;              // Stunde zum Starten
+  int minute;            // Minute zum Starten
+  bool days[7];          // Wochentage (Mo-So)
+  int duration;          // Dauer in Minuten
+  int maxBrightness;     // Maximale Helligkeit
+  bool active;           // Aktiviert/Deaktiviert
+};
+
 struct DisplaySettings {
   int darkHour;
   int darkMinute;
@@ -82,6 +101,7 @@ struct DisplaySettings {
 
 extern AlarmSettings alarmSettings;
 extern DisplaySettings displaySettings;
+extern SunsetSettings sunsetSettings;  // NEU
 
 extern const int brightOptions[7];
 extern uint32_t sunriseColors[10];
@@ -91,6 +111,8 @@ extern uint32_t sunriseColors[10];
 // Funktionsdeklarationen - Main Screen
 void drawMainScreen();
 void drawLightButton();
+void drawSunsetButton();  // NEU
+void drawStatusBetweenButtons();  // NEU
 void updateMainScreenTime(DateTime now);
 uint16_t getSkyColor(int hour, int minute, int y);
 uint16_t getGroundColor();
@@ -101,10 +123,13 @@ void drawMountains();
 
 // Funktionsdeklarationen - Andere Screens
 void drawMenuScreen();
+void drawMenuScreen2();     // NEU: Zweites Menü
 void drawTimeScreen();
 void drawDateScreen();
 void drawAlarmScreen();
 void drawSunriseScreen(int duration, int brightness);
+void drawAbendlichtScreen(int duration, int brightness);  // Zeitplan (Uhrzeit, Tage)
+void drawSunsetScreen(int duration, int brightness);      // Einstellungen (Dauer, Helligkeit)
 void drawDisplayScreen();
 
 // Funktionsdeklarationen - Touch
@@ -122,6 +147,8 @@ void handleTimeButtons(int x, int y);
 void handleDateButtons(int x, int y);
 void handleAlarmButtons(int x, int y);
 void handleSunriseButtons(int x, int y);
+void handleAbendlichtButtons(int x, int y);  // Zeitplan
+void handleSunsetButtons(int x, int y);      // Einstellungen
 
 // Sensor State Struct
 struct SensorState {
@@ -149,13 +176,15 @@ void handleSensor(bool currState, bool lastState, bool &stripOn, int startLED, i
 void setNightlight(int startLED, int endLED, int darkZone, int fadeZone, int brightness);
 void handleBacklight();
 void checkAlarmTrigger();
+void checkSunsetTrigger();  // NEU
 
 // Funktionsdeklarationen - Nightlight
 void loadNightlightSettings();
 void saveNightlightSettings();
 void updateDimming();
 
-// Funktionsdeklarationen - Sunrise
+// Funktionsdeklarationen - Sunrise & Sunset
 void updateSunrise();
+void updateSunset();  // NEU
 
 #endif
