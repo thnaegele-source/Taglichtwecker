@@ -70,6 +70,20 @@ void setup() {
   displaySettings.alwaysOnHour = 7;
   displaySettings.alwaysOnMinute = 0;
   
+  // NEU: Sunset-Einstellungen initialisieren
+  sunsetSettings.hour = 22;             // Standard: 22:00 Uhr
+  sunsetSettings.minute = 0;
+  sunsetSettings.duration = 20;         // 20 Minuten Standard
+  sunsetSettings.maxBrightness = 30;    // Niedrigere Helligkeit zum Einschlafen
+  sunsetSettings.active = false;        // Standardmäßig aus
+  for (int i = 0; i < 7; i++) {
+    sunsetSettings.days[i] = false;     // Alle Tage deaktiviert
+  }
+  sunsetRunning = false;
+  sunsetStartTime = 0;
+  screenSunsetStartTime = 0;
+  Serial.println("Sunset-Settings initialisiert");
+  
   // Touch-Kalibrierung laden oder durchführen
   Serial.println("Lade Touch-Kalibrierung...");
   loadTouchCalibration();
@@ -91,8 +105,8 @@ void loop() {
   // === DEBUG: Alle 2 Sekunden Status ausgeben ===
   static unsigned long lastStatusDebug = 0;
   if (millis() - lastStatusDebug > 2000) {
-    Serial.printf("LOOP STATUS: sunriseRunning=%d, leftStripOn=%d, rightStripOn=%d, lightOn=%d\n", 
-                  sunriseRunning, leftStripOn, rightStripOn, lightOn);
+    Serial.printf("LOOP STATUS: sunriseRunning=%d, sunsetRunning=%d, leftStripOn=%d, rightStripOn=%d, lightOn=%d\n", 
+                  sunriseRunning, sunsetRunning, leftStripOn, rightStripOn, lightOn);
     lastStatusDebug = millis();
   }
   
@@ -101,8 +115,11 @@ void loop() {
   handleBacklight();
   handleTouchInput(now);
   checkAlarmTrigger();
+  checkSunsetTrigger();  // NEU: Sunset-Timer prüfen
   
+  // NEU: Beide Animationen aktualisieren
   if (sunriseRunning) updateSunrise();
+  if (sunsetRunning) updateSunset();  // NEU
   
   if (currentScreen != SCREEN_MAIN && millis() - lastScreenTime > AUTO_BACK_DELAY) {
     currentScreen = SCREEN_MAIN;
