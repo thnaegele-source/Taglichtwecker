@@ -1,6 +1,13 @@
 #include "Globals.h"
 
 void updateSunrise() {
+  // NEU: Sunset stoppen wenn Sunrise läuft
+  if (sunsetRunning) {
+    sunsetRunning = false;
+    screenSunsetStartTime = 0;
+    Serial.println("Sunset gestoppt - Sunrise hat Priorität");
+  }
+  
   // WICHTIG: Startzeit beim ersten Aufruf setzen, nicht beim Button-Druck!
   static bool initialized = false;
   
